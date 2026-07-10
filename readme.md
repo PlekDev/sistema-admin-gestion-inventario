@@ -1,12 +1,13 @@
-# La Casita — Panel de Administración
+# Admin Panel — Sistema de Inventario y Ventas
 
-Sistema de administración interno para La Casita: gestión de productos, categorías, ubicaciones, usuarios y corte diario de ventas.
+Panel de administración interno: gestión de productos, categorías, inventario, usuarios y reporte de ventas, con una terminal de punto de venta (POS) integrada.
 
-Desarrollado por **Konekt** como parte del sistema integral de inventarios y ventas.
+![Status](https://img.shields.io/badge/Status-Plantilla-blue)
+![Node](https://img.shields.io/badge/Node-18+-green)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-blue)
 
-![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow)
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![SQLite](https://img.shields.io/badge/DB-SQLite-lightgrey)
+> Plantilla base neutra, lista para personalizar con tu propia marca, datos y despliegue.
 
 ---
 
@@ -15,7 +16,7 @@ Desarrollado por **Konekt** como parte del sistema integral de inventarios y ven
 - [Arquitectura](#-arquitectura)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [Instalación y Uso](#-instalación-y-uso)
-- [Módulos del Panel Admin](#-módulos-del-panel-admin)
+- [Módulos del Panel](#-módulos-del-panel)
 - [Usuarios de prueba](#-usuarios-de-prueba)
 - [Roadmap](#-roadmap)
 
@@ -23,41 +24,39 @@ Desarrollado por **Konekt** como parte del sistema integral de inventarios y ven
 
 ## 🧭 ¿Qué es este repo?
 
-Este repositorio contiene el sistema operativo de La Casita: un **POS (Punto de Venta)** para cajeros y un **Panel de Administración** para gestión interna. Ambos corren como archivos HTML estáticos servidos por un backend Python/Flask con base de datos SQLite.
+Monorepo con dos aplicaciones:
 
-| Interfaz | URL | Acceso |
-|----------|-----|--------|
-| POS — Punto de Venta | `http://localhost:3001/` | Cajeros |
-| Admin — Panel de gestión | `http://localhost:3001/admin.html` | Solo administradores |
+| App | Descripción | Puerto |
+|-----|-------------|--------|
+| `apps/web` | Panel de administración + POS (Next.js / React) | `3001` |
+| `apps/api` | API REST (Node.js / Express) sobre PostgreSQL | `3002` |
+
+El frontend hace *proxy* de las rutas `/api/*` hacia la API mediante `rewrites` en `next.config.js`.
 
 ---
 
 ## 🏗 Arquitectura
 
-Arquitectura simple y sin dependencias externas. Todo corre localmente con Python y SQLite.
-
 ```
 ┌─────────────────────────────────────────┐
-│           Navegador (Frontend)          │
-│                                         │
-│  index.html  ←──── POS / Cajeros        │
-│  admin.html  ←──── Panel Admin          │
+│        Navegador (Panel + POS)          │
+│           Next.js  ·  puerto 3001       │
 └────────────────────┬────────────────────┘
-                     │ HTTP / REST API
+                     │ /api/*  (rewrite)
 ┌────────────────────▼────────────────────┐
-│         Python / Flask (server.py)      │
+│        Node.js / Express  ·  3002       │
 │                                         │
 │  /api/auth        /api/products         │
-│  /api/sales       /api/sessions         │
-│  /api/locations   /api/admin/*          │
+│  /api/sales       /api/health           │
+│  /api/dashboard   /api/inventory/*      │
 └────────────────────┬────────────────────┘
-                     │
+                     │ pg (PostgreSQL)
 ┌────────────────────▼────────────────────┐
-│           SQLite (lacasita.db)          │
+│         PostgreSQL (Neon o local)       │
 │                                         │
-│  User · Location · Category · Product  │
-│  Inventory · Sale · SaleItem           │
-│  CashSession                           │
+│  usuarios · categorias · productos      │
+│  ventas · detalle_venta                 │
+│  movimientos_inventario                 │
 └─────────────────────────────────────────┘
 ```
 
@@ -66,31 +65,33 @@ Arquitectura simple y sin dependencias externas. Todo corre localmente con Pytho
 ## 📂 Estructura del Proyecto
 
 ```text
-lacasitadeli-konekt-admin/
+admin-panel/
 ├── apps/
 │   ├── api/
 │   │   └── src/
 │   │       ├── db/
-│   │       │   └── lacasita.db          # Base de datos SQLite
+│   │       │   └── index.js              # Pool de conexión a PostgreSQL
 │   │       ├── modules/
-│   │       │   ├── auth.js              # Login y ubicaciones
-│   │       │   ├── products.js          # Consulta de productos e inventario
-│   │       │   ├── sales.js             # Registro y reporte de ventas
-│   │       │   └── sessions.js          # Control de caja (apertura/cierre)
-│   │       ├── index.js                 # Servidor Node (legacy)
-│   │       └── server.py                # Servidor principal Python/Flask ✅
+│   │       │   ├── auth.js               # Login y usuarios
+│   │       │   ├── products.js           # Productos e inventario
+│   │       │   └── sales.js              # Registro y reporte de ventas
+│   │       └── index.js                  # Servidor Express
 │   │
 │   └── web/
-│       └── public/
-│           ├── index.html               # POS — Punto de Venta (cajeros)
-│           └── admin.html               # Panel de Administración
+│       └── app/
+│           ├── layout.tsx                # Layout raíz
+│           ├── page.tsx                  # Panel de administración + POS
+│           └── globals.css               # Estilos base
 │
 ├── infra/
-│   └── docker-compose.yml               # Opcional: n8n para automatizaciones
+│   ├── docker-compose.yml                # Opcional: n8n para automatizaciones
+│   ├── init-neon.js                      # Inicializa el schema en PostgreSQL
+│   └── update_schema.sql                 # Migración / definición de tablas
 │
-├── iniciar.sh                           # Arranque rápido (Linux/Mac)
-├── iniciar.bat                          # Arranque rápido (Windows)
-└── README.md
+├── iniciar.sh                            # Arranque rápido (Linux/Mac)
+├── ejecutar.bat                          # Arranque rápido (Windows)
+├── reparar_instalar.bat                  # Reinstalación limpia (Windows)
+└── readme.md
 ```
 
 ---
@@ -98,8 +99,24 @@ lacasitadeli-konekt-admin/
 ## 🚀 Instalación y Uso
 
 ### Requisitos
-- Python 3.11+
-- Flask (`pip install flask`)
+- Node.js 18+
+- Una base de datos PostgreSQL (local o en la nube, p. ej. Neon)
+
+### Configuración
+
+1. Crea `apps/api/.env` con tu cadena de conexión:
+
+   ```env
+   PORT=3002
+   DATABASE_URL=postgresql://usuario:contraseña@host:5432/mi_base_de_datos?sslmode=require
+   ```
+
+2. Inicializa el schema (crea tablas y funciones):
+
+   ```bash
+   cd infra
+   node init-neon.js
+   ```
 
 ### Arranque rápido
 
@@ -111,64 +128,49 @@ chmod +x iniciar.sh
 
 **Windows:**
 ```bat
-iniciar.bat
+ejecutar.bat
 ```
 
-El script verifica Python, instala Flask si no está, e inicia el servidor en `http://localhost:3001`.
-
-### Arranque manual
-```bash
-cd apps/api/src
-python3 server.py
-```
+- Panel: `http://localhost:3001`
+- API health: `http://localhost:3002/api/health`
 
 ---
 
-## 🧩 Módulos del Panel Admin
-
-Accesible en `http://localhost:3001/admin.html` — solo para cuentas con rol `admin`.
+## 🧩 Módulos del Panel
 
 | Módulo | Descripción |
 |--------|-------------|
 | 📊 **Dashboard** | Métricas del día: ventas, ingresos, ganancia estimada, ticket promedio, top productos y alertas de stock bajo |
-| 📦 **Productos** | Alta, edición y baja de productos con código de barras, precio, costo, categoría y unidad |
-| 🏷️ **Categorías** | Gestión de categorías con color personalizado (se refleja en el POS) |
-| 📍 **Ubicaciones** | Alta de sucursales, almacenes, restaurante y ecommerce |
-| 👤 **Usuarios** | Gestión de cajeros, bodegueros y administradores con roles y contraseñas |
-| 🧾 **Corte del día** | Reporte filtrable por fecha y sucursal: ingresos por método de pago, productos más vendidos y detalle completo de ventas |
+| 📦 **Inventario** | Alta, edición y baja de productos con código de barras, precio, costo, categoría y stock |
+| 🛒 **Ventas (POS)** | Terminal de cobro con carrito, escáner de código de barras y métodos de pago |
+| 🧾 **Reportes** | Historial de ventas filtrable por periodo |
+| 🔔 **Alertas** | Monitoreo de productos con stock por debajo del mínimo |
 
 ---
 
 ## 👤 Usuarios de prueba
 
-| Correo | Contraseña | Rol |
-|--------|------------|-----|
-| `admin@lacasita.com` | `admin123` | Administrador |
-| `cajero1@lacasita.com` | `cajero123` | Cajero |
-| `cajero2@lacasita.com` | `cajero123` | Cajero |
+Los hashes de contraseña iniciales son *placeholders*, por lo que el login de desarrollo valida solo por email (ver `apps/api/src/modules/auth.js`). Reemplaza por `bcrypt` antes de producción.
+
+| Correo | Rol |
+|--------|-----|
+| `admin@example.com` | Administrador |
+| `cajero1@example.com` | Cajero |
+| `cajero2@example.com` | Cajero |
 
 ---
 
 ## 🗺 Roadmap
 
-- [x] **Fase 0** — POS base: cobro, carrito, sesión de caja, inventario y reportes
-- [x] **Fase 0.5** — Panel admin: CRUD de productos, categorías, ubicaciones y usuarios
-- [ ] **Fase 1** — Rutas `/api/admin/*` en backend: guardar, editar y eliminar desde el panel
-- [ ] **Fase 1.5** — Control de inventario: entradas desde bodega, salidas por sucursal
-- [ ] **Fase 2** — Integración con Shopify: sincronización de stock en tiempo real
-- [ ] **Fase 2.5** — Integración con NOVACAJA: ventas físicas descuentan inventario central
-- [ ] **Fase 3** — Control de consumos en restaurante/bar
-- [ ] **Fase 3.5** — Alertas de stock bajo y caducidades vía n8n
-- [ ] **Fase 4** — Reportes consolidados multi-canal (tienda, ecommerce, restaurante)
-
----
-
-## 🔗 Repositorio
-
-[github.com/PlekDev/lacasitadeli-konekt-admin](https://github.com/PlekDev/lacasitadeli-konekt-admin)
+- [x] POS base: cobro, carrito e inventario
+- [x] Panel admin: CRUD de productos y reportes de ventas
+- [ ] Autenticación con hash (bcrypt) y sesiones
+- [ ] Control de inventario: entradas y salidas por ubicación
+- [ ] Alertas de stock bajo y caducidades vía n8n
+- [ ] Reportes consolidados multi-canal
 
 ---
 
 ## 📄 Licencia
 
-Proyecto privado — propiedad de La Casita. Desarrollado por Konekt. Uso interno únicamente.
+Plantilla base — personaliza esta sección con la licencia y propiedad que corresponda.

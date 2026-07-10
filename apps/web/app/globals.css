@@ -9,7 +9,7 @@
 }
 
 .font-serif {
-  font-family: 'Newsreader', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .material-symbols-outlined {
@@ -23,7 +23,7 @@
   direction: ltr;
 }
 
-/* Custom scrollbar for Editorial Artisanship */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -34,22 +34,22 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c8c2;
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #717973;
+  background: #94a3b8;
 }
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(252, 249, 244, 0.8);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
 }
 
-/* Editorial layout utilities */
-.editorial-grid {
+/* Layout utilities */
+.grid-12 {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 2rem;

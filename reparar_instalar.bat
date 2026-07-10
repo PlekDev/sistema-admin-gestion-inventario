@@ -2,13 +2,13 @@
 setlocal enabledelayedexpansion
 
 :: Configuración
-title La Casita - Instalador y Reparador
+title Admin Panel - Instalador y Reparador
 color 0D
 cd /d "%~dp0"
 
 echo.
 echo ============================================================
-echo     LA CASITA - INSTALACION Y REPARACION INTEGRAL
+echo     ADMIN PANEL - INSTALACION Y REPARACION INTEGRAL
 echo ============================================================
 echo.
 echo Este script realizara una limpieza profunda y reinstalara

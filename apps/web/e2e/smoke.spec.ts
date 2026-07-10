@@ -4,7 +4,7 @@ test('Dashboard renders with key components', async ({ page }) => {
   await page.goto('http://localhost:3001');
 
   // Verify main logo text (part of sidebar)
-  await expect(page.getByRole('heading', { name: 'La Casita Deli' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
 
   // Verify main heading
   await expect(page.getByRole('heading', { name: 'DASHBOARD' })).toBeVisible();

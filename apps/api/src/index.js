@@ -93,6 +93,6 @@ app.get('/api/inventory/movements', async (req, res) => {
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`🏪 La Casita POS — API corriendo en http://localhost:${PORT}`);
+  console.log(`🏪 Admin Panel — API corriendo en http://localhost:${PORT}`);
   console.log(`🗄️  Base de datos: Neon PostgreSQL`);
 });

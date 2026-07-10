@@ -1,10 +1,10 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────────────────────
-#  La Casita POS — Script de inicio rápido (con Neon PostgreSQL)
+#  Admin Panel — Script de inicio rápido (con Neon PostgreSQL)
 # ─────────────────────────────────────────────────────────────────────────────
 
 echo ""
-echo "  🏪  La Casita — Sistema de Punto de Venta"
+echo "  🏪  Admin Panel — Sistema de Punto de Venta"
 echo "  ──────────────────────────────────────────"
 echo ""
 

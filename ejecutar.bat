@@ -1,11 +1,11 @@
 @echo off
-title La Casita - Servidor Unificado
+title Admin Panel - Servidor Unificado
 color 0A
 cd /d "%~dp0"
 
 echo.
 echo ============================================================
-echo    INICIANDO LA CASITA (MODO admin local)
+echo    INICIANDO ADMIN PANEL (MODO admin local)
 echo ============================================================
 echo.
 echo Los servidores se iniciaran en segundo plano 

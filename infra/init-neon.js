@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * init-neon.js  —  Inicializa el schema de La Casita en Neon PostgreSQL
+ * init-neon.js  —  Inicializa el schema en Neon PostgreSQL
  * 
  * Uso:
  *   cd infra
